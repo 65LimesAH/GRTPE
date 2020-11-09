@@ -1,43 +1,29 @@
-import { Tedis, TedisPool } from 'tedis';
+import { config } from 'dotenv';
 
-const express = require('express');
-const { ApolloServer, gql } = require('apollo-server-express');
+import { ApolloServer } from 'apollo-server';
+import { applyMiddleware } from 'graphql-middleware';
+import { permissions } from './utils/rules';
+import { schema } from './schema';
+import { isDev } from './utils/constants';
+import { createContext } from './utils/helpers';
 
-const typeDefs = gql`
-  type Query {
-    hello: String
-  }
-`;
+config();
 
-const resolvers = {
-  // Account: {
-  //   _resolveReference(object) {
-  //     return accounts.find((account) => account.id === object.id);
+export const server = new ApolloServer({
+  schema: applyMiddleware(schema, permissions),
+  context: createContext,
+  playground: true,
+  tracing: isDev(),
+  introspection: true,
+  debug: isDev(),
+  cors: true,
+  // subscriptions: {
+  //   onConnect: (_connectionParams, _websocket, connContext): SocketContext => {
+  //     return {
+  //       req: connContext.request,
+  //       prisma,
+  //       pubsub,
+  //     }
   //   },
   // },
-
-  Query: {
-    hello: () => 'Hello world!',
-  },
-  Mutation: {
-    login(parent, { email, password }) {
-      const { id, permissions, roles } = accounts.find(
-        (account) => account.email === email && account.password === password,
-      );
-      return jwt.sign(
-        { 'https://awesomeapi.com/graphql': { roles, permissions } },
-        'f1BtnWgD3VKY',
-        { algorithm: 'HS256', subject: id, expiresIn: '1d' },
-      );
-    },
-  },
-};
-
-const server = new ApolloServer({ typeDefs, resolvers });
-
-const app = express();
-server.applyMiddleware({ app });
-
-app.listen({ port: 4000 }, () =>
-  console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`),
-);
+});
