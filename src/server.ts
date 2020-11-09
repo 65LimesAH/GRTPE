@@ -10,11 +10,11 @@ const typeDefs = gql`
 `;
 
 const resolvers = {
-  Account: {
-    _resolveReference(object) {
-      return accounts.find((account) => account.id === object.id);
-    },
-  },
+  // Account: {
+  //   _resolveReference(object) {
+  //     return accounts.find((account) => account.id === object.id);
+  //   },
+  // },
 
   Query: {
     hello: () => 'Hello world!',
