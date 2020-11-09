@@ -1,0 +1,16 @@
+# env vars
+.env*
+!.env.example
+
+# nexus/prisma
+*.db
+dist/
+
+# misc
+node_modules
+package-lock.json
+.eslintignore
+.idea
+coverage/
+.eslintcache
+.DS_Store
