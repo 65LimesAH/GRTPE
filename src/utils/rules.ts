@@ -1,7 +1,7 @@
-import { shield, rule } from 'graphql-shield';
+import { rule, shield } from 'graphql-shield';
 import { Context } from '../types';
 import { handleError } from './helpers';
-import { errors } from './constants';
+import { errors } from './constant';
 
 export const rules = {
   isAuthenticatedUser: rule({ cache: 'contextual' })(

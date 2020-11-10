@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { PubSub } from 'apollo-server';
 import { Request, Response } from 'express';
-// import { IncomingMessage } from 'http'
+import { IncomingMessage } from 'http'
 
 export interface Context {
   prisma: PrismaClient;
@@ -11,11 +11,11 @@ export interface Context {
   userId: number;
 }
 
-// export interface SocketContext {
-//   prisma: PrismaClient
-//   req: IncomingMessage
-//   pubsub: PubSub
-// }
+export interface SocketContext {
+  prisma: PrismaClient
+  req: IncomingMessage
+  pubsub: PubSub
+}
 
 export interface Token {
   userId: number;

@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { PubSub } from 'apollo-server';
 import { sign, verify } from 'jsonwebtoken';
-import { APP_SECRET, tokens } from './constants';
+import { APP_SECRET, tokens } from './constant';
 import { Context, Token } from '../types';
 
 export const handleError = (error: any) => {
@@ -25,7 +25,7 @@ export const generateAccessToken = (userId: number) => {
 };
 
 export const prisma = new PrismaClient();
-const pubsub = new PubSub();
+export const pubsub = new PubSub();
 
 export const createContext = (ctx: any): Context => {
   let userId: number;
