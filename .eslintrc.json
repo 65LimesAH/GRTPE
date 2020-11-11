@@ -26,11 +26,14 @@
 
     ],
     "rules": {
-        "prettier/prettier": "error",
+        "prettier/prettier": ["error", {
+            "endofLine": "auto"
+        }],
         "no-unused-vars": "off",
         "@typescript-eslint/ban-ts-comment": 0,
         "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
         "no-console": "off",
+        "consistent-return": "off",
         "max-len": ["error", {
             "code": 100
         }],
