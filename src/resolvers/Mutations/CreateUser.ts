@@ -1,12 +1,12 @@
 import { extendType, stringArg } from '@nexus/schema';
-import { compare, hash } from 'bcrypt';
+import { hash } from 'bcrypt';
 import { generateAccessToken, handleError } from '../../utils/helpers';
 import { errors } from '../../utils/constant';
 
-export const user = extendType({
+export const createUser = extendType({
   type: 'Mutation',
   definition(t) {
-    t.field('signup', {
+    t.field('createUser', {
       type: 'AuthPayload',
       args: {
         name: stringArg({ nullable: true }),
@@ -16,6 +16,7 @@ export const user = extendType({
       async resolve(_parent, { name, email, password }, ctx) {
         try {
           const hashedPassword = await hash(password, 10);
+          console.log(hashedPassword, ctx);
           const user = await ctx.prisma.user.create({
             data: {
               name,
@@ -23,8 +24,8 @@ export const user = extendType({
               password: hashedPassword,
             },
           });
-
           const accessToken = generateAccessToken(user.id);
+          console.log(accessToken);
           return {
             accessToken,
             user,
@@ -32,37 +33,6 @@ export const user = extendType({
         } catch (e) {
           handleError(errors.userAlreadyExists);
         }
-      },
-    });
-
-    t.field('login', {
-      type: 'AuthPayload',
-      args: {
-        email: stringArg({ required: true }),
-        password: stringArg({ required: true }),
-      },
-      async resolve(_parent, { email, password }, ctx) {
-        let user = null;
-        try {
-          user = await ctx.prisma.user.findOne({
-            where: {
-              email,
-            },
-          });
-        } catch (e) {
-          handleError(errors.invalidUser);
-        }
-
-        if (!user) handleError(errors.invalidUser);
-
-        const passwordValid = await compare(password, user.password);
-        if (!passwordValid) handleError(errors.invalidUser);
-
-        const accessToken = generateAccessToken(user.id);
-        return {
-          accessToken,
-          user,
-        };
       },
     });
   },
