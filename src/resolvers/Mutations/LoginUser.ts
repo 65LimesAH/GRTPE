@@ -1,37 +1,35 @@
-import { extendType, stringArg } from '@nexus/schema';
-import { compare } from 'bcrypt';
-import { generateAccessToken, handleError } from '../../utils/helpers';
-import { errors } from '../../utils/constant';
+// import { mutationType,extendInputType stringArg } from '@nexus/schema';
+// import { compare } from 'bcrypt';
+// import { sign } from 'jsonwebtoken';
 
-export const LoginUser = extendType({
-  type: 'Mutation',
-  definition(t) {
-    t.field('LoginUser', {
-      type: 'AuthPayload',
-      args: {
-        email: stringArg({ required: true }),
-        password: stringArg({ required: true }),
-      },
-      async resolve(_parent, { email, password }, ctx) {
-        let user = null;
-        try {
-          user = await ctx.prisma.user.findOne({
-            where: {
-              email,
-            },
-          });
-        } catch (e) {
-          handleError(errors.invalidUser);
-        }
-        if (!user) handleError(errors.invalidUser);
-        const passwordValid = await compare(password, user.password);
-        if (!passwordValid) handleError(errors.invalidUser);
-        const accessToken = generateAccessToken(user.id);
-        return {
-          accessToken,
-          user,
-        };
-      },
-    });
-  },
-});
+// export const LoginUser = extendInputType({
+//   definition(t) {
+//     t.field('LoginUser', {
+//       type: 'AuthPayload',
+//       args: {
+//         email: stringArg({ nullable: false }),
+//         password: stringArg({ nullable: false }),
+//       },
+//       resolve: async (_parent, { email, password }, ctx) => {
+//         // const { pubsub } = ctx;
+//         const user = await ctx.prisma.user.findOne({
+//           where: {
+//             email,
+//           },
+//         });
+//         if (!user) {
+//           throw new Error(`No user found for email: ${email}`);
+//         }
+//         const passwordValid = await compare(password, user.password);
+//         if (!passwordValid) {
+//           throw new Error('Invalid password');
+//         }
+//         // pubsub.publish(USER_SIGNED_IN, user);
+//         return {
+//           token: sign({ userId: user.id }, process.env.APP_SECRET),
+//           user,
+//         };
+//       },
+//     });
+//   },
+// });

@@ -27,7 +27,7 @@
     ],
     "rules": {
         "prettier/prettier": ["error", {
-            "endofLine": "auto"
+            "endOfLine": "auto"
         }],
         "no-unused-vars": "off",
         "@typescript-eslint/ban-ts-comment": 0,

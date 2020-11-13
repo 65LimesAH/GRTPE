@@ -1,65 +1,50 @@
 import { ApolloServer } from 'apollo-server-express';
 import { applyMiddleware } from 'graphql-middleware';
-import { SocketContext } from 'types';
 import { ApolloServerPluginInlineTrace } from 'apollo-server-core';
 import express from 'express';
-import { Http2Server } from 'http2';
-import { createServer as createHttpServer } from 'http';
+import cors from 'cors';
+import { createServer } from 'http';
 import { schema } from './schema';
-import { isDev } from './utils/constant';
-import { createContext, prisma, pubsub } from './utils/helpers';
-import { createApp } from './app';
+import { createContext } from './utils/context';
 
-require('dotenv-flow').config({ path: 'dotEnv/' });
+require('dotenv-flow').config({ path: 'env/' });
 
-const { PORT } = process.env;
+const { PORT = 8000 } = process.env;
 
-const createApolloServer = (): ApolloServer =>
-  new ApolloServer({
-    schema: applyMiddleware(schema),
-    context: createContext,
-    playground: true,
-    tracing: isDev(),
-    introspection: true,
-    debug: isDev(),
-    plugins: [ApolloServerPluginInlineTrace()],
-    subscriptions: {
-      onConnect: (
-        _connectionParams,
-        _websocket,
-        connContext,
-      ): SocketContext => {
-        return {
-          req: connContext.request,
-          prisma,
-          pubsub,
-        };
-      },
-    },
-  });
-const initializeApolloServer = (
-  apollo: ApolloServer,
-  app: express.Application,
-): (() => void) => {
-  apollo.applyMiddleware({ app });
-  return (): void => {
-    process.stdout.write(
-      `🚀 Server ready at http://localhost:${PORT}${apollo.graphqlPath}\n`,
-    );
-  };
+const app = express();
+const options: cors.CorsOptions = {
+  allowedHeaders: [
+    'Origin',
+    'X-Requested-With',
+    'Content-Type',
+    'Accept',
+    'X-Access-Token',
+  ],
+  credentials: true,
+  methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
+  origin: '*',
+  preflightContinue: false,
 };
-export const startServer = async (
-  app: express.Application,
-): Promise<Http2Server> => {
-  const httpServer = createHttpServer(app);
-  const apollo = createApolloServer();
-  apollo.installSubscriptionHandlers(httpServer);
-  const handleApolloServerInitialized = initializeApolloServer(apollo, app);
-  return httpServer.listen({ port: PORT }, () => {
-    handleApolloServerInitialized();
-  });
-};
-if (process.env.NODE_ENV !== 'test') {
-  const app = createApp();
-  startServer(app);
-}
+app.use(cors(options));
+app.get('/', (req, res) => {
+  res.send('It works x 1');
+});
+
+const server = createServer(app);
+
+const apollo = new ApolloServer({
+  schema,
+  context: createContext,
+  playground: true,
+  tracing: true,
+  introspection: true,
+  debug: true,
+  plugins: [ApolloServerPluginInlineTrace()],
+});
+apollo.applyMiddleware({ app });
+
+server.listen({ port: PORT }, () => {
+  process.stdout.write(
+    `🚀 Server ready at http://localhost:${PORT}${apollo.graphqlPath}\n`,
+  );
+});

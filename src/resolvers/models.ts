@@ -1,33 +1,21 @@
 import { objectType } from '@nexus/schema';
 
-export const Post = objectType({
-  name: 'Post',
-  definition(t) {
-    t.model.id();
-    t.model.published();
-    t.model.title();
-    t.model.content();
-    t.model.author();
-  },
-});
-
 export const User = objectType({
   name: 'User',
   definition(t) {
     t.model.createdAt();
     t.model.id();
-    t.model.name();
+    t.model.firstName();
+    t.model.lastName();
     t.model.email();
-    t.model.posts({
-      pagination: true,
-    });
+    t.model.password();
   },
 });
 
 export const AuthPayload = objectType({
   name: 'AuthPayload',
   definition(t) {
-    t.string('accessToken');
+    t.string('token');
     t.field('user', { type: 'User' });
   },
 });
