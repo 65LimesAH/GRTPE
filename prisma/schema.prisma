@@ -25,7 +25,6 @@ model permissions {
   permission    String
   User_id       Int
 
-  @@index([])
 }
 
 
